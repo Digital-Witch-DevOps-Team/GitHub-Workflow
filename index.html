@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Team Git & GitHub Collaboration Workflow</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <p class="eyebrow">Digital-Witch-DevOps-Team · Team handbook</p>
+    <h1>Git &amp; GitHub Collaboration Workflow</h1>
+    <p class="subtitle">A practical, role-based guide for senior DevOps engineers, junior developers, project managers, documentation contributors, and reviewers. Follow the same branch directions, review gates, and security practices for every task.</p>
+    <div class="tag-row"><span class="tag">Fork → Feature branch</span><span class="tag">Pull request review</span><span class="tag">Dev-Team → main</span><span class="tag">Protected branches</span></div>
+  </div>
+</header>
+<main>
+  <nav class="toc" aria-label="Contents">
+    <h2>On this page</h2>
+    <ul>
+      <li><a href="#overview">Workflow overview</a></li>
+      <li><a href="#senior-setup">Senior: initial setup</a></li>
+      <li><a href="#protection">Branch protection</a></li>
+      <li><a href="#junior">Junior workflow</a></li>
+      <li><a href="#review">Senior review</a></li>
+      <li><a href="#promotion">Dev-Team to main</a></li>
+      <li><a href="#rules">Team rules</a></li>
+    </ul>
+  </nav>
+
+  <section class="card" id="overview">
+    <h2>1. Workflow at a glance</h2>
+    <p class="lead">Use the following route for every assignment. Feature work is developed on a branch, reviewed in a pull request, and only then integrated into the shared branch.</p>
+    <div class="flow" aria-label="Workflow stages">
+      <div class="flow-item"><span class="num">1</span><strong>Fork &amp; branch</strong><small>Junior starts from upstream/Dev-Team</small></div>
+      <div class="flow-item"><span class="num">2</span><strong>Commit &amp; push</strong><small>Push to the junior's fork</small></div>
+      <div class="flow-item"><span class="num">3</span><strong>PR to Dev-Team</strong><small>Senior reviews and approves</small></div>
+      <div class="flow-item"><span class="num">4</span><strong>Test integration</strong><small>Senior checks shared Dev-Team</small></div>
+      <div class="flow-item"><span class="num">5</span><strong>PR to main</strong><small>Promote after tests and approval</small></div>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Stage</th><th>Owner</th><th>Expected result</th></tr></thead>
+      <tbody>
+        <tr><td>Initial repository setup</td><td>Senior / maintainer</td><td>Organisation `main` and `Dev-Team` are published.</td></tr>
+        <tr><td>Task development</td><td>Junior developer</td><td>A feature branch starts at `upstream/Dev-Team`.</td></tr>
+        <tr><td>First pull request</td><td>Junior + senior reviewer</td><td>Junior fork feature branch → organisation `Dev-Team`.</td></tr>
+        <tr><td>Development verification</td><td>Senior team</td><td>Changes are inspected and relevant tests are run.</td></tr>
+        <tr><td>Release promotion</td><td>Senior team + reviewer</td><td>Organisation `Dev-Team` → organisation `main` through a separate PR.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="grid">
+      <div class="mini-card"><strong><span class="badge">`Dev-Team`</span></strong>Shared development and integration branch. Changes enter by reviewed pull request.</div>
+      <div class="mini-card"><strong><span class="badge green">`main`</span></strong>Stable branch. Promote only reviewed, tested changes by pull request.</div>
+    </div>
+  </section>
+
+  <section class="card" id="senior-setup">
+    <h2>2. Senior: initialise the organisation repository</h2>
+    <p>Run once from a parent folder where the project folder should be created. The organisation repository should already exist. Ideally it is empty when importing an existing Git history; if it contains independent commits, stop and reconcile the histories instead of force-pushing.</p>
+    <pre><code># Clone the original/source project
+git clone https://github.com/digitalwitchdemo/Final-Project-architecture-EKS-terraform.git
+cd Final-Project-architecture-EKS-terraform
+
+git status
+git branch --show-current
+
+# Configure this repository only (no --global)
+git config user.name "YOUR GITHUB USERNAME"
+git config user.email "YOUR GITHUB NOREPLY EMAIL"
+
+# Keep source as upstream; use the organisation repository as origin
+git remote rename origin upstream
+git remote add origin https://github.com/Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC.git
+git remote -v
+
+# Assumes the source branch is named main
+git push -u origin main
+git switch -c Dev-Team
+git push -u origin Dev-Team</code></pre>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Remote in senior clone</th><th>Points to</th><th>Purpose</th></tr></thead>
+      <tbody><tr><td><code>origin</code></td><td><code>Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC</code></td><td>Push and fetch the organisation repository.</td></tr><tr><td><code>upstream</code></td><td><code>digitalwitchdemo/Final-Project-architecture-EKS-terraform</code></td><td>Original source repository.</td></tr></tbody>
+    </table></div>
+    <div class="callout warning"><strong>Before the first push:</strong> confirm <code>git branch --show-current</code> reports <code>main</code>. If the source uses a different default branch, verify the right branch before proceeding. Authenticate using the approved GitHub sign-in method; never place access tokens or passwords in this document.</div>
+    <p class="small">For commit attribution, copy your exact noreply address from GitHub → Settings → Emails. Repeat the local Git identity configuration in each clone where it is needed.</p>
+  </section>
+
+  <section class="card" id="protection">
+    <h2>3. Organisation: protect `Dev-Team` and `main`</h2>
+    <p>Open the organisation repository's <strong>Settings → Rules → Rulesets → New branch ruleset</strong>. Interface labels may change slightly over time.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Setting</th><th>Protect Dev-Team</th><th>Protect Main</th></tr></thead>
+      <tbody>
+        <tr><td>Enforcement</td><td>Active</td><td>Active</td></tr>
+        <tr><td>Target branch</td><td>Include by pattern: <code>Dev-Team</code></td><td>Include default branch (usually <code>main</code>)</td></tr>
+        <tr><td>Require pull request before merging</td><td>On</td><td>On</td></tr>
+        <tr><td>Required approvals</td><td>1</td><td>1</td></tr>
+        <tr><td>Dismiss stale approvals when new commits are pushed</td><td>On</td><td>On</td></tr>
+        <tr><td>Block force pushes</td><td>On</td><td>On</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout">Keep the bypass list empty if administrators and contributors must follow the same rules. Add bypass access only for an explicitly approved exception. Validate permissions using a normal contributor account.</div>
+  </section>
+
+  <section class="card" id="junior">
+    <h2>4. Junior developer: fork, branch, and submit work</h2>
+    <h3>Step A — Fork on GitHub</h3>
+    <ol>
+      <li>Open the <a href="https://github.com/Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC">organisation repository</a> and click <strong>Fork</strong>.</li>
+      <li>Choose your personal GitHub account as the owner, for example <code>Ose-Jossy</code>.</li>
+      <li>Keep the repository name <code>Terraform-Infrastructure-as-code-IaC</code> unless the team says otherwise.</li>
+      <li>Uncheck <strong>Copy the default branch only</strong> if you want all branches copied. This is optional for the workflow because you will fetch `Dev-Team` from the organisation remote.</li>
+      <li>Click <strong>Create fork</strong>.</li>
+    </ol>
+    <h3>Step B — Clone the junior's fork</h3>
+    <pre><code>git clone https://github.com/JUNIOR-USERNAME/Terraform-Infrastructure-as-code-IaC.git
+cd Terraform-Infrastructure-as-code-IaC
+git status
+git branch --show-current</code></pre>
+    <h3>Step C — Add the organisation as `upstream`</h3>
+    <pre><code>git remote add upstream https://github.com/Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC.git
+git remote -v
+git fetch upstream
+git branch -r</code></pre>
+    <div class="table-wrap"><table><thead><tr><th>Remote in junior clone</th><th>Must point to</th></tr></thead><tbody><tr><td><code>origin</code></td><td>The junior's personal fork</td></tr><tr><td><code>upstream</code></td><td>The organisation repository</td></tr><tr><td><code>upstream/Dev-Team</code></td><td>Organisation branch to base feature work on</td></tr></tbody></table></div>
+    <p class="small">The <code>origin/*</code> branches vary depending on the fork options. The key check is that <code>git fetch upstream</code> makes <code>upstream/Dev-Team</code> available.</p>
+    <h3>Step D — Configure identity and create a feature branch</h3>
+    <pre><code># Set identity for this clone only
+git config user.name "YOUR GITHUB USERNAME"
+git config user.email "YOUR GITHUB NOREPLY EMAIL"
+git config --local --list
+
+# Branch from the organisation's Dev-Team
+git switch -c feature/update-terraform upstream/Dev-Team
+git branch
+git status</code></pre>
+    <p>Use a new task-specific branch for each assignment, for example <code>feature/add-vpc-module</code> or <code>docs/update-deployment-guide</code>.</p>
+    <h3>Step E — Review, stage, commit, and push</h3>
+    <pre><code># Edit assigned files in VS Code, then inspect changes
+git status --short
+
+# Stage only the intended files
+git add path/to/changed-file1 path/to/changed-file2
+git diff --cached
+
+git commit -m "Add short description of change"
+git push -u origin feature/update-terraform</code></pre>
+    <div class="callout danger"><strong>Never commit secrets.</strong> Do not stage real <code>.env</code>, <code>atlas.credentials.env</code>, cloud credentials, access keys, private keys, passwords, tokens, or Terraform state files. Ignore sensitive local files with <code>.gitignore</code> and use safe placeholder values in <code>.env.example</code>. If a secret was committed or pushed, revoke/rotate it immediately; deleting the file later is not enough.</div>
+    <p>Example patterns to review and adapt in the repository's <code>.gitignore</code> (keep any existing project rules you need):</p>
+    <pre><code># Local environment and credential files
+.env
+.env.*
+!.env.example
+atlas*.env
+*.pem
+*.key
+
+# Terraform local state/cache; follow the team's state-management policy
+.terraform/
+*.tfstate
+*.tfstate.*</code></pre>
+    <h3>Step F — Raise the pull request on GitHub</h3>
+    <p>After pushing, open the junior's fork in a browser and click <strong>Compare &amp; pull request</strong>. The pull request is created on GitHub, not by a local Git command.</p>
+    <div class="table-wrap"><table><thead><tr><th>Pull request selector</th><th>Correct value</th></tr></thead><tbody>
+      <tr><td>Base repository</td><td><code>Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC</code></td></tr>
+      <tr><td>Base branch / destination</td><td><code>Dev-Team</code></td></tr>
+      <tr><td>Head repository / source</td><td><code>JUNIOR-USERNAME/Terraform-Infrastructure-as-code-IaC</code></td></tr>
+      <tr><td>Compare branch / source branch</td><td><code>feature/update-terraform</code></td></tr>
+    </tbody></table></div>
+    <div class="callout success"><strong>Correct direction:</strong> <code>JUNIOR-USERNAME:feature/update-terraform</code> → <code>Digital-Witch-DevOps-Team:Dev-Team</code>.</div>
+  </section>
+
+  <section class="card" id="review">
+    <h2>5. Senior: review and merge into `Dev-Team`</h2>
+    <ol>
+      <li>Open the PR in the organisation repository using a senior reviewer account with write access.</li>
+      <li>Read the PR description and inspect <strong>Files changed</strong>.</li>
+      <li>Check correctness, secrets, infrastructure/configuration, documentation, and evidence of testing.</li>
+      <li>Select <strong>Review changes → Approve → Submit review</strong> when ready.</li>
+      <li>Resolve required checks and review requests. Merge only when GitHub permits it.</li>
+    </ol>
+    <p>The junior author and approving reviewer should be different accounts for this team's workflow. The approval must be a formal <strong>Approve</strong> review, not just a conversation comment.</p>
+    <h3>Update the senior's local `Dev-Team`</h3>
+    <pre><code>git status
+git fetch origin
+git switch Dev-Team
+git pull --ff-only origin Dev-Team
+git log -5 --oneline
+git status</code></pre>
+    <p>Inspect the files that actually changed and run the project's required tests. For the practice example, <code>cat junior-work.txt</code> reads that file if it exists.</p>
+    <div class="callout success">No push is needed to receive the junior's PR after it has been merged on GitHub. Fetch and pull update the senior's local branch.</div>
+  </section>
+
+  <section class="card" id="promotion">
+    <h2>6. Senior: promote tested `Dev-Team` into `main`</h2>
+    <h3>Refresh both local branches</h3>
+    <pre><code>git fetch origin
+git switch main
+git pull --ff-only origin main
+git switch Dev-Team
+git pull --ff-only origin Dev-Team
+
+# Optional: summarise differences between the remote branches
+git diff --stat origin/main...origin/Dev-Team</code></pre>
+    <p class="small">These commands update the senior's local branches. They do not merge `Dev-Team` into `main`.</p>
+    <h3>Create the promotion PR on GitHub</h3>
+    <ol>
+      <li>Open the organisation repository → <strong>Pull requests → New pull request</strong>.</li>
+      <li>Set <strong>Base / destination</strong> to <code>main</code>.</li>
+      <li>Set <strong>Compare / source</strong> to <code>Dev-Team</code>.</li>
+      <li>Suggested title: <code>Promote tested Dev-Team changes to main</code>.</li>
+      <li>Summarise the work and tests; create the PR.</li>
+      <li>Review changed files/checks, obtain the required approval, and merge only when permitted.</li>
+      <li>After merging, update local `main`:</li>
+    </ol>
+    <pre><code>git switch main
+git pull --ff-only origin main</code></pre>
+    <div class="callout warning"><strong>Do not shortcut protection:</strong> avoid <code>git merge Dev-Team</code> followed by <code>git push origin main</code> while `main` protection is active. The PR preserves the required reviews and rules.</div>
+    <h3>Senior needs to contribute a change?</h3>
+    <p>Use a working branch instead of direct commits to the protected `Dev-Team` branch:</p>
+    <pre><code>git fetch origin
+git switch Dev-Team
+git pull --ff-only origin Dev-Team
+git switch -c senior/update-practice-file
+
+# Edit files, then stage only intended paths
+git status --short
+git add path/to/changed-file
+git diff --cached
+git commit -m "Update development configuration"
+git push -u origin senior/update-practice-file</code></pre>
+    <p>Open a PR with <strong>Base: `Dev-Team`</strong> and <strong>Compare: `senior/update-practice-file`</strong>, then review and merge under the same rules.</p>
+  </section>
+
+  <section class="card" id="rules">
+    <h2>7. Non-negotiable team rules</h2>
+    <div class="table-wrap"><table><thead><tr><th>Rule</th><th>Why it matters</th></tr></thead><tbody>
+      <tr><td>Do not commit directly to `main`.</td><td>Releases must go through the review workflow.</td></tr>
+      <tr><td>Use pull requests for changes to protected `Dev-Team`.</td><td>Reviews catch mistakes before integration.</td></tr>
+      <tr><td>Never commit credentials, `.env` secrets, private keys, tokens, or Terraform state.</td><td>Secrets can remain exposed in repository history after a file is deleted.</td></tr>
+      <tr><td>Check `git status --short` and `git diff --cached` before a commit.</td><td>Prevents unrelated or sensitive files from being committed accidentally.</td></tr>
+      <tr><td>Run `git remote -v` before pushing if uncertain.</td><td>Prevents pushing to the wrong repository.</td></tr>
+      <tr><td>Do not use force-push to work around a rejected push.</td><td>Force pushes can discard collaborators' history.</td></tr>
+      <tr><td>If `git pull --ff-only` fails, stop and inspect status/history.</td><td>A failed fast-forward may mean the local branch diverged; do not reset blindly.</td></tr>
+      <tr><td>Use one feature branch per task, meaningful commits, and clear PR descriptions.</td><td>Makes review and project tracking easier.</td></tr>
+    </tbody></table></div>
+    <h3>Official GitHub guidance</h3>
+    <ul>
+      <li><a href="https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request-from-a-fork">Creating a pull request from a fork</a></li>
+      <li><a href="https://docs.github.com/en/pull-requests/how-tos/work-with-forks/fork-a-repo">Fork a repository</a></li>
+      <li><a href="https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets">Available rules for rulesets</a></li>
+      <li><a href="https://docs.github.com/en/pull-requests/how-tos/review-pull-requests/approving-a-pull-request-with-required-reviews">Approving a pull request with required reviews</a></li>
+      <li><a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository">Removing sensitive data from a repository</a></li>
+    </ul>
+  </section>
+</main>
+<footer>
+  <p>Team handbook · Keep repository URLs, branch names, and access policies aligned with the organisation's current setup. Review this guide when the workflow or GitHub rules change.</p>
+</footer>
+</body>
+</html>

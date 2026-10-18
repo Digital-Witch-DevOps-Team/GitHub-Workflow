@@ -1,0 +1,253 @@
+ORGANISATION CLONE (ORGANISATION USE)
+
+Create a folder and open it with Vscode
+
+$ git clone https://github.com/digitalwitchdemo/Final-Project-architecture-EKS-terraform.git
+
+$ cd Final-Project-architecture-EKS-terraform
+
+$ git status
+
+$ git remote rename origin upstream
+
+$ git remote -v
+
+$ git config user.name "GITHUB USERNAME"
+
+$ git config user.email "12345678+username@users.noreply.github.com
+
+$ git push -u origin main
+
+Authenticate to your Github account (MobileApp/Software that is if you have that set up)
+
+
+CREATING A BRANCH (ORGANISATION USE)
+
+$ git switch -c 'Dev-Team'
+
+$ git branch
+
+$ git push -u origin 'Dev-Team'
+
+##########################################################################################################################
+
+HOW DOES THE JUNIOR DEVELOPER WORK WITH THE DEV-TEAM BRANCH (DEV-TEAM)
+
+Step 1 — Fork POD5 organisation repository (Make sure you are member of that organisation)
+
+I.  Open the organisation repository: Terraform-Infrastructure-as-code-IaC.
+II. Click Fork at the top-right of the repository page.
+III.On the fork page, set the following:
+	- Owner: Ose-Jossy
+	- Repository name: Terraform-Infrastructure-as-code-IaC
+	- Uncheck the box that says: Copy the main branch only.
+IV. Click Create fork.
+
+Step 2 — Clone the fork to your computer
+
+Create a folder in your local machine and open it with Vscode
+
+$ git clone https://github.com/Junior-Username/Terraform-Infrastructure-as-code-IaC.git
+
+$ cd Terraform-Infrastructure-as-code-IaC
+
+$ git branch 		`			#It should be on main
+
+Step 3 — Point to the Dev-Team Repo
+
+$ git remote add upstream https://github.com/Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC.git 		#The Junior dev point to their own fork and the upstream point to the Dev-Team Branch exist
+
+$ git remote -v 				#You should see
+						-origin → Ose-Jossy/Terraform-Infrastructure-as-code-IaC
+						-upstream → Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC
+
+$ git fetch upstream				#This downloads the organisation's branch information so the junior can access Dev-Team without switching directly to the organisation's repository
+
+$ git branch -r
+  origin/Dev-Team
+  origin/HEAD -> origin/main
+  origin/main
+  upstream/Dev-Team 					#This is where we should be
+  upstream/HEAD -> upstream/main
+  upstream/main
+
+Step 4 — Set your configurations
+
+$ git config user.name "YOUR USERNAME"
+
+$ git config user.email "12345678+username@users.noreply.github.com"
+
+Step 5 — Create a features branch before making any changes
+
+$ git switch -c feature/update-terraform upstream/Dev-Team		#This creates a new branch called feature/update-terraform based on the organisation's Dev-Team branch and switches the junior onto it.
+
+$ git branch
+* feature/update-terraform (where the * is where you are)
+  main
+
+$ git status					#you should see nothing to commit, working tree clean
+
+$ touch Aws-vpc junior-work Junior-REAMME.md .env atlas.credntials.env	#Add files or make changes as assigned
+
+Step 6 — Add all you changes, commit them and push.
+
+$ git add .
+
+$ git commit -m "Junior-Dev Username made some changes to the following files; Aws-vpc junior-work Junior-REAMME.md .env atlas.credntials.env"
+
+$ git status					#You should see a statement like this "On branch feature/update-terraform, Your branch is ahead of 'upstream/Dev-Team' by 1 commit. (use "git push" to publish your local commits) nothing to commit, working tree clean"
+
+$ git push -u origin feature/update-terraform			# git push uploads the commit to GitHub.
+-u sets the tracking relationship for future pushes.
+origin is the junior's fork, JuniorDevusername/Terraform-Infrastructure-as-code-IaC.
+feature/update-terraform is the junior's working branch.
+
+Step 7 (Final step) — Go to your GitHub Account
+
+JUNIOR DEV RASIE A PULL REQUEST FROM THE FORKED REPO ON JUNIOR DEV GITHUB ACCOUNT (DEV-TEAM)
+
+After pushing the feature branch, the junior visits their fork on GitHub and clicks Compare & pull request.
+
+Check the destination very important
+On that page, look just below the title for a line similar to:
+Junior Dev Username wants to merge 1 commit into ... from ...
+
+It should show:
+- Into / base: Oragnisation Name-Team:Dev-Team
+- From / compare: Junior Dev Username:feature/update-terraform
+
+The senior then reviews and approves the PR before merging it.
+
+##########################################################################################################################
+
+HOW TO PROTECT DEV-TEAM BRANCH (ORGANISATION USE)
+
+Open the organisation repository's Settings → Rules → Rulesets.
+Click New ruleset → New branch ruleset.
+
+The intended configuration is:
+
+-Ruleset Name* : Protect Dev-Team
+-Enforcement status : Active
+-Target branches: Add Target
+	click included by pattern: Dev-Team
+
+Branch Rules
+- Enforcement status: Active
+- Require a pull request before merging: On
+	-Required approvals: 1
+	-Dismiss stale pull request approvals when new commits are pushed.On
+- Block force pushes: On
+
+HOW TO PROTECT MAIN BRANCH (ORGANISATION USE)
+Open the organisation repository's Settings → Rules → Rulesets.
+Click New ruleset → New branch ruleset.
+
+The intended configuration is:
+
+-Ruleset Name* : Protect Main
+-Enforcement status : Active
+-Target branches: Add Target
+	click Include default branch.
+
+Branch Rules
+- Enforcement status: Active
+- Require a pull request before merging: On
+	-Required approvals: 1
+	-Dismiss stale pull request approvals when new commits are pushed.On
+- Block force pushes: On
+
+
+SENIOR WORKFLOW TO CHECK/UPDATE JUNIOR DEV WORK ON VSCODE/LOCAL MACHINE (ORGANISATION USE)
+
+$ git branch				#switch to Dev-Team
+
+$ git switch Dev-Team			#Switch to the Dev-Team branch
+
+$ git fetch origin			#Retrieve/DOWNLOADED the latest information from the organisation repository.
+
+$ git pull --ff-only origin Dev-Team 	#Update your local Dev-Team with the organisation's latest changes, provided a fast-forward is possible.
+
+$ git log -5 --oneline			#Inspect the latest five commits.
+
+$ ls					#List files in the current directory.
+
+$ cat junior-work.txt			#See inside the file and edit what even you need to edit before merging
+
+
+SENIOR PROMOTION: DEV-TEAM TO MAIN BRANCH (ORGANISATION USE)
+
+$ git fetch origin			#Retrieve/DOWNLOADED the latest information from the organisation repository
+
+$ git switch main
+
+$ git pull --ff-only origin main	#Update your local Main with the organisation's latest changes, provided a fast-forward is possible.
+
+$ git switch Dev-Team
+
+$ git pull --ff-only origin Dev-Team	#Update your local Main with the organisation's latest changes, provided a fast-forward is possible.
+
+These commands update your local branches; they do not merge Dev-Team into main
+
+CREATE THE PULL REQUEST FROM DEV TEAM TO MAIN (ORGANISATION USE)
+
+You can do this directly on GitHub.
+
+1. Open the organisation repository: Terraform-Infrastructure-as-code-IaC.
+
+2. Click Pull requests.
+
+3. Click New pull request.
+
+4. Set the branches exactly as follows:
+Base (destination): main
+Compare (source): Dev-Team
+Correct direction: Dev-Team → main
+
+5. Click Create pull request.
+
+6. Use this title: Promote tested Dev-Team changes to main
+
+7. In the description, you can write: This pull request promotes the reviewed and tested changes from Dev-Team into main. The junior developer's work was reviewed and merged into Dev-Team before this promotion.
+
+8.Click Create pull request to open it.
+
+9.Obtain the required independent approval, check the merge status, and click Merge pull request when GitHub permits it
+
+
+TO MAKE CHANGES ON THE DEV-TEAM AS THE SENIOR DEV IF NO PROTECTIONS (ORGANISATION USE)
+
+$ git switch Dev-Team 				#Moves you to the development branch.
+
+$ git pull origin Dev-Team 			#Downloads and integrates the latest changes from GitHub.
+
+$ git status
+
+$ git add .
+
+$ git commit -m "Update development configuration"
+
+$ git push origin Dev-Team
+
+
+TO MAKE CHANGES ON MAIN OR MERGE DEV-TEAM TO MAIN BRANCH IF NO PROTECTION (ORGANISATION USE)
+
+$ git switch main
+
+$ git pull origin main
+
+$ git merge Dev-Team
+
+$ git push origin main
+
+
+
+
+
+
+
+
+
+
+
+

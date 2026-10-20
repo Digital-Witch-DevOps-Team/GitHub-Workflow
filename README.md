@@ -1,8 +1,20 @@
-# Team Git & GitHub Collaboration Workflow
-
-> **Purpose:** A shared, beginner-friendly guide for project managers, documentation teams, senior DevOps engineers, and junior contributors working in the `Digital-Witch-DevOps-Team` organisation repository.
-
 ## 1. Workflow at a glance
+
+<img width="609" height="666" alt="GitHub Workflow" src="https://github.com/user-attachments/assets/854af4bf-ceca-4502-97b4-8b241274547c" />
+
+**Purpose:** A shared, beginner-friendly guide for project managers, documentation teams, senior DevOps engineers, and junior contributors working in the `Digital-Witch-DevOps-Team` organisation repository.
+
+Important rules for every team member
+
+- **Never commit directly to `main`.** Promote work through an approved PR.
+- When protection is active, send changes to `Dev-Team` through PRs as well. Avoid direct pushes to protected branches.
+- Do not force-push to shared branches; do not use `--force` to work around a rejected push.
+- Do not commit secrets, credentials, `.env` files, private keys, or Terraform state files.
+- Before `git add`, inspect `git status --short`; before `git commit`, inspect `git diff --cached`.
+- `origin` and `upstream` have different meanings in the senior and junior clones. Check with `git remote -v` before pushing.
+- If `git pull --ff-only` fails, stop and inspect `git status` and branch history. Do not immediately reset or force-push.
+- Use one feature branch per task and write clear commit messages and PR descriptions.
+
 
 | Stage | Owner | What happens | Pull request destination |
 |---|---|---|---|
@@ -66,7 +78,7 @@ git switch -c Dev-Team
 git push -u origin Dev-Team
 ```
 
-**Important:** These commands assume the cloned source's current branch is `main`. Confirm with `git branch --show-current`. If it is named differently, stop and verify the correct default branch before pushing. Authenticate through Git Credential Manager/browser or your approved GitHub authentication method when prompted. Never paste a password or token into this README.
+**Important:** These commands assume the cloned source's current branch is `main`. Confirm with `git branch --show-current`. If it is named differently, stop and verify the correct default branch before pushing. Authenticate through Git Credential Manager/browser or your approved GitHub authentication method when prompted.
 
 ### Local Git identity
 
@@ -75,6 +87,12 @@ The `git config` commands above apply only to this repository. Use the exact Git
 ---
 
 ## 3. Organisation: protect `Dev-Team` and `main`
+
+<img width="799.2" height="410" alt="Protect your main Dev branch" src="https://github.com/user-attachments/assets/1639a6f1-6f0a-4411-8d0e-dccdb8de11d7" />
+
+
+
+<img width="799.2" height="410" alt="Protect your main Dev branch 1" src="https://github.com/user-attachments/assets/c1d7f7be-030d-4e46-94dd-ae928c4b17c8" />
 
 In the organisation repository, open **Settings → Rules → Rulesets → New branch ruleset**. The exact labels can change slightly as GitHub updates its interface.
 
@@ -94,6 +112,8 @@ Keep the bypass list empty if the intention is for administrators and contributo
 ## 4. Junior developer: fork and clone the organisation repository
 
 ### Step 1 — Fork the repository on GitHub
+
+<img width="1577" height="760" alt="Forking the repo" src="https://github.com/user-attachments/assets/df512b91-eb35-42a9-a32e-69e97ae459bb" />
 
 1. Open [the organisation repository](https://github.com/Digital-Witch-DevOps-Team/Terraform-Infrastructure-as-code-IaC).
 2. Click **Fork**.
@@ -133,6 +153,8 @@ Expected remote meaning:
 In `git branch -r`, look for **`upstream/Dev-Team`**. The list of `origin/*` branches can vary depending on whether the fork copied all branches; that is okay as long as `git fetch upstream` shows `upstream/Dev-Team`.
 
 ### Step 4 — Set your Git identity in this clone only
+
+<img width="1581" height="819" alt="setup your noreply email" src="https://github.com/user-attachments/assets/4956494a-f3cf-42e8-b1c2-a5841af91150" />
 
 ```bash
 git config user.name "YOUR GITHUB USERNAME"
@@ -187,6 +209,8 @@ atlas*.env
 
 ### Step 7 — Open the junior pull request on GitHub
 
+<img width="1583" height="775" alt="Junior_Developer Pull request" src="https://github.com/user-attachments/assets/b16aa8be-4262-407a-a22b-b54e1b96f2d5" />
+
 The junior opens the PR **on GitHub in the browser**, after pushing the feature branch. The local clone is used to make, commit, and push the work; the PR itself is created on the GitHub website.
 
 On the new PR page, check both the repository and branch selectors:
@@ -200,17 +224,21 @@ On the new PR page, check both the repository and branch selectors:
 
 The direction must be:
 
+<img width="1593" height="766" alt="Junior Pull Request settings" src="https://github.com/user-attachments/assets/0055b014-4a98-4eb1-8a4b-5995b2ce0beb" />
+
+
 **`JUNIOR-USERNAME:feature/update-terraform` → `Digital-Witch-DevOps-Team:Dev-Team`**
 
-Add a clear title and summary, mention the task or issue, and click **Create pull request**. Do not create the PR in the opposite direction. The junior can select **Allow edits from maintainers** only when that is appropriate for the project; review the implications for repositories containing GitHub Actions workflows.
-
+Add a clear title and summary, mention the task or issue, and click **Create pull request**. Do not create the PR in the opposite direction.
 ---
 
 ## 5. Senior: review and merge the junior PR into `Dev-Team`
 
+<img width="1587" height="829" alt="After Creating a compare   Pull request" src="https://github.com/user-attachments/assets/da2dd11d-8224-4d37-9c97-6612c5663c50" />
+
 ### Review on GitHub
 
-1. Sign in using a senior/reviewer account that has write access to the organisation repository.
+1. Senior/reviewer account that has write access to the organisation repository.
 2. Open **Pull requests** and select the junior's PR.
 3. Review the description and click **Files changed**.
 4. Check correctness, security, Terraform/configuration changes, naming, documentation, and test evidence.
@@ -296,18 +324,6 @@ git push -u origin senior/update-practice-file
 
 Then create a PR with **Base: `Dev-Team`** and **Compare: `senior/update-practice-file`**, review it, obtain approval, and merge it. Use another branch name for each new task.
 
----
-
-## 8. Important rules for every team member
-
-- **Never commit directly to `main`.** Promote work through an approved PR.
-- When protection is active, send changes to `Dev-Team` through PRs as well. Avoid direct pushes to protected branches.
-- Do not force-push to shared branches; do not use `--force` to work around a rejected push.
-- Do not commit secrets, credentials, `.env` files, private keys, or Terraform state files.
-- Before `git add`, inspect `git status --short`; before `git commit`, inspect `git diff --cached`.
-- `origin` and `upstream` have different meanings in the senior and junior clones. Check with `git remote -v` before pushing.
-- If `git pull --ff-only` fails, stop and inspect `git status` and branch history. Do not immediately reset or force-push.
-- Use one feature branch per task and write clear commit messages and PR descriptions.
 
 ## Official references
 
